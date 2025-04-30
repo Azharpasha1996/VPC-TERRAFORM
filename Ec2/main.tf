@@ -8,7 +8,7 @@ provider "aws" {
 resource "aws_security_group" "web_sg" {
     name = "web_sg"
     description = "Allow SSH and HTTP"
-    vpc_id = data.aws_vpc.default.vpc_id
+    vpc_id = data.aws_vpc.default.id
 
     ingress  {
         description = "Allow SSH"
@@ -47,12 +47,6 @@ data "aws_vpc" "default" {
   
 }
 
-# Get a default subnet
-
-data "aws_subnet_ids" "default" {
-    vpc_id  = data.aws_vpc.default.id
-  
-}
 
 data "aws_subnet" "default" {
     id = tolist(data.aws_subnet_ids.default.ids)[0]
