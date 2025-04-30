@@ -40,18 +40,19 @@ resource "aws_security_group" "web_sg" {
   
 }
 
-# Get the default VPC (used for SG and subnet lookup)
-
+# Get the default VPC
 data "aws_vpc" "default" {
-    default = true
-  
+  default = true
 }
 
-
-data "aws_subnet" "default" {
-    id = tolist(data.aws_subnet_ids.default.ids)[0]
-  
+# Get all subnets in the default VPC
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
 }
+
 
 
 # Create an Ec2 Instance
@@ -59,7 +60,7 @@ data "aws_subnet" "default" {
 resource "aws_instance" "web_server" {
     ami = var.ami_id
     instance_type = var.instance_type
-    subnet_id = data.aws_subnet.default.id
+    subnet_id = data.aws_subnets.default.ids[0]
     vpc_security_group_ids = [aws_security_group.web_sg.id]
     key_name = var.key_name
 
